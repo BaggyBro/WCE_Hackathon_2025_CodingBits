@@ -19,6 +19,10 @@ const Order = sequelize.define("Order", {
     status: { 
         type: DataTypes.ENUM("PENDING", "COMPLETED", "CANCELLED"), 
         defaultValue: "PENDING" 
+    },
+    expires_at: { 
+        type: DataTypes.DATE,
+        allowNull: true
     }
 });
 

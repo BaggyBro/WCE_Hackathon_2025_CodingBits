@@ -28,6 +28,28 @@ exports.getAllOrders = async (req, res) => {
     }
 };
 
+exports.createSellOrder = async (req, res) => {
+    try {
+        const { user_id, cct_amount, price_per_cct } = req.body;
+
+        const expiresAt = new Date();
+        expiresAt.setMinutes(expiresAt.getMinutes() + 5); // ⏳ Expire in 5 mins
+
+        const newOrder = await Order.create({
+            user_id,
+            order_type: "SELL",
+            cct_amount,
+            price_per_cct,
+            expires_at: expiresAt
+        });
+
+        res.json({ message: "Sell order created!", order: newOrder });
+    } catch (error) {
+        console.error("❌ Error creating order:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 
 exports.placeOrder = async (req, res) => {
     try {

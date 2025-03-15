@@ -6,6 +6,7 @@ const transactionController = require("../controllers/transactionController")
 const orderController = require("../controllers/orderController")
 const bidController = require("../controllers/bidController")
 const marketPriceController = require("../controllers/marketPriceController")
+const sellOrderController = require("../controllers/sellOrderController")
 
 router.post("/register", authController.register);
 router.post("/login", authController.login)
@@ -17,11 +18,14 @@ router.post("/sell", transactionController.sellTokens);
 router.post("/order", orderController.placeOrder)
 router.get("/listorder", orderController.getAllOrders)
 router.post("/buyexecute", orderController.executeBuy)
-router.post("/approve", orderController.approveCCT)
 
 router.post("/placebid", bidController.placeBid);
-router.post("/acceptbid", bidController.acceptBid);
 router.post("/listbid", bidController.viewBids);
+router.post("/bidbywallet", bidController.getBidsByWallet);
 
 router.get("/getmarketprice", marketPriceController.getMarketPrice)
+
+router.post("/approve", sellOrderController.approveTokens)
+router.post("/sellorder", sellOrderController.createSellOrder)
+
 module.exports = router;
