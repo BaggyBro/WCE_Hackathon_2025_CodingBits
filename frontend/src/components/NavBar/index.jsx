@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FiMenu, FiX, FiHome, FiUser, FiSettings, FiLogOut, FiShoppingCart, FiBook, FiFlag } from "react-icons/fi";
+import { FiMenu, FiX, FiHome, FiUser, FiSettings, FiLogOut, FiShoppingCart, FiBook, FiFlag, FiClipboard } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { path } from "framer-motion/client";
@@ -8,6 +8,7 @@ import { path } from "framer-motion/client";
 const menuItems = [
   { name: "Dashboard", icon: <FiHome />, path: "/dashboard" },
   { name: "Marketplace", icon: <FiShoppingCart />, path: "/marketplace" },
+  { name: "Project Management", icon: <FiClipboard />, path: "/projectmanagementdashboard" },
   { name: "Transaction", icon: <FiSettings/>, path: "/transaction"},
   { name: "My Orders", icon: <FiBook/>, path: "/orders"},
   { name: "Bids", icon: <FiFlag/>, path: "/bids"}
@@ -15,7 +16,7 @@ const menuItems = [
 
 const SideNavbar = ({ activePage }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const navigate = useNavigate(); // ✅ Allows page navigation
+  const navigate = useNavigate(); //  Allows page navigation
 
   return (
     <motion.div
@@ -43,7 +44,7 @@ const SideNavbar = ({ activePage }) => {
         {menuItems.map((item) => (
           <motion.div
             key={item.name}
-            onClick={() => navigate(item.path)} // ✅ Navigate when clicked
+            onClick={() => navigate(item.path)} //  Navigate when clicked
             className={`flex items-center gap-3 px-4 py-3 mx-2 rounded-lg cursor-pointer transition-all ${
               activePage === item.name ? "bg-white text-blue-600" : "hover:bg-blue-500"
             }`}
@@ -66,7 +67,7 @@ const SideNavbar = ({ activePage }) => {
 };
 
 SideNavbar.propTypes = {
-  activePage: PropTypes.string.isRequired, // ✅ Corrected prop validation
+  activePage: PropTypes.string.isRequired, //  Corrected prop validation
 };
 
 export default SideNavbar;
