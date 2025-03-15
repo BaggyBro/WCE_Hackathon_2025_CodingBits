@@ -5,7 +5,7 @@ const { ethers } = require("ethers");
 const fs = require("fs");
 const {User, Order, MarketPrice, Transaction } = require("./models");
 const router = require('./routes/routes')
-const { checkAndMarkExpiredOrders} = require("./scripts/expiry")
+const { checkAndRemoveExpiredOrders} = require("./scripts/expiry")
 
 const app = express();
 app.use(express.json());
@@ -36,8 +36,7 @@ const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, wallet);
 
-setInterval(checkAndMarkExpiredOrders, 10000);
-
+setInterval(checkAndRemoveExpiredOrders, 10000);
 app.listen(PORT, () => {
     console.log(`✅ Server is running on http://localhost:${PORT}`);
 });

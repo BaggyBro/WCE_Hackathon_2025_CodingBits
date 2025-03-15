@@ -1,84 +1,42 @@
 
-const { Op } = require("sequelize");
 const { Order, Bid, User } = require("../models");
-const { ethers } = require("ethers");
+const { Op } = require("sequelize");
+const { executeTransaction } = require("../utils/transaction");
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
-const RPC_URL = process.env.RPC_URL;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-  const contractABI = require("/home/baggybro/skills/soft/WCE_Hack/blockchain/artifacts/contracts/carbonCreditToken.sol/CarbonCreditToken.json").abi;
-
-const provider = new ethers.JsonRpcProvider(RPC_URL);
-const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, wallet);
-
-async function checkAndMarkExpiredOrders() {
-  console.log("🔍 Checking for expired orders...");
-
-  const expiredOrders = await Order.findAll({
-    where: {
-      expires_at: { [Op.lt]: new Date().toISOString().slice(0, 19).replace("T", " ") },
-      status: "PENDING",
-    },
-  });
-
-  console.log(expiredOrders);
-
-  for (const order of expiredOrders) {
-    console.log(`⏳ Order ${order.id} expired. Checking highest bidder...`);
-
-    const highestBid = await Bid.findOne({
-      where: { order_id: order.id },
-      order: [["bid_price", "DESC"]], // Sort bids by highest price
+const checkAndRemoveExpiredOrders = async () => {
+  try {
+    const expiredOrders = await Order.findAll({
+      where: {
+        expires_at: { [Op.lte]: new Date() }, // Orders with expiry time <= now
+        status: "PENDING",
+      },
+      include: [{ model: Bid, required: false, order: [["bid_price", "DESC"]], limit: 1 }],
     });
 
-    if (highestBid) {
-      console.log(`✅ Highest bid found from Buyer ${highestBid.buyer_id}. Processing transaction...`);
+    for (const order of expiredOrders) {
+      const highestBid = order.Bids.length > 0 ? order.Bids[0] : null;
 
-      const seller = await User.findByPk(order.user_id);
-      const buyer = await User.findByPk(highestBid.buyer_id);
+      if (highestBid) {
+        // ✅ Process transaction if there is a highest bidder
+        const success = await executeTransaction(order, highestBid);
 
-      if (!seller || !buyer) {
-        console.error("❌ Seller or Buyer not found, skipping transaction.");
-        continue;
+        if (success) {
+          await order.update({ status: "COMPLETED" });
+          await highestBid.update({ status: "ACCEPTED" });
+        } else {
+          await order.update({ status: "CANCELLED" });
+        }
+      } else {
+        // ❌ No bids, just mark as expired
+        await order.update({ status: "CANCELLED" });
       }
-
-      try {
-        // 🔹 Transfer ETH from Buyer to Seller
-        const txEth = await wallet.sendTransaction({
-          to: seller.wallet_address,
-          value: ethers.parseEther(highestBid.bid_price.toString()),
-        });
-        await txEth.wait();
-        console.log(`💰 ETH Transfer Success: ${txEth.hash}`);
-
-        // 🔹 Transfer CCT Tokens from Seller to Buyer
-        const txCCT = await contract.transferFrom(
-          seller.wallet_address,
-          buyer.wallet_address,
-          ethers.parseEther(order.cct_amount.toString())
-        );
-        await txCCT.wait();
-        console.log(`✅ CCT Transfer Success: ${txCCT.hash}`);
-
-        // 🔹 Mark Order & Bid as Completed
-        await order.update({ status: "COMPLETED" });
-        await highestBid.update({ status: "ACCEPTED" });
-
-      } catch (error) {
-        console.error("❌ Transaction Failed:", error);
-        continue;
-      }
-
-    } else {
-      console.log(`❌ No bids for Order ${order.id}. Marking as EXPIRED.`);
-      await order.update({ status: "EXPIRED" });
     }
+  } catch (error) {
+    console.error("❌ Error checking expired orders:", error);
   }
-}
+};
 
-// ✅ Run check every 10 seconds
-setInterval(checkAndMarkExpiredOrders, 10000);
+setInterval(checkAndRemoveExpiredOrders, 10000);
 
-module.exports = { checkAndMarkExpiredOrders };
+module.exports = { checkAndRemoveExpiredOrders };
 

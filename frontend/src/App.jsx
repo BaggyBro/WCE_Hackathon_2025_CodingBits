@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import SignIn from "./components/signinpage/InputBox";
 import MyBids from "./components/bids/MyBids";
 import MyOrders from "./components/orders/MyOrders";
+import CarbonProjectDashboard from "./components/projectmanagement";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,6 +33,7 @@ function App() {
                   <Routes>
                     <Route path="/dashboard/:company_name" element={<Dashboard />} />
                     <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/projectmanagementdashboard" element={<CarbonProjectDashboard/>} />
                     <Route path="/orders" element={<MyOrders />} />
                     <Route path="/bids" element={<MyBids />} />
                   </Routes>

@@ -22,12 +22,12 @@ ChartJS.register(
   Legend
 );
 
-const PriceTrendChart = ({ data }) => {
+const PriceTrendChart2 = ({ data }) => {
   const chartData = {
     labels: data.map(item => item.date),
     datasets: [
       {
-        label: 'CO2 Emissions per metric ton',
+        label: 'Carbon Credit Price',
         data: data.map(item => item.price),
         borderColor: '#2563eb',
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -46,7 +46,7 @@ const PriceTrendChart = ({ data }) => {
       },
       title: {
         display: true,
-        text: 'CO2 Emissions Trend'
+        text: 'Carbon Credit Price Trend'
       }
     },
     scales: {
@@ -81,7 +81,7 @@ const PriceTrendChart = ({ data }) => {
 
 
 
-PriceTrendChart.propTypes = {
+PriceTrendChart2.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       date: PropTypes.string.isRequired,
@@ -91,4 +91,4 @@ PriceTrendChart.propTypes = {
 };
 
 
-export default PriceTrendChart;
+export default PriceTrendChart2;

@@ -7,9 +7,9 @@ async function main() {
 
     const CarbonCreditToken = await hre.ethers.getContractFactory("CarbonCreditToken");
     const cct = await CarbonCreditToken.deploy();  
-    await cct.waitForDeployment(); // ✅ Use waitForDeployment() instead of deployed()
+    await cct.waitForDeployment(); 
 
-    console.log(`CCT deployed at: ${await cct.getAddress()}`); // ✅ Use getAddress() instead of .target
+    console.log(`CCT deployed at: ${await cct.getAddress()}`); 
 }
 
 main().catch((error) => {

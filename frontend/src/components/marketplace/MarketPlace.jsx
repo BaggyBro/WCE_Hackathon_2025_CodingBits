@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import PriceTrendChart from "../dashboard/components/PriceTrendChart"; // Import the graph component
+import PriceTrendChart2 from "../dashboard/components/PriceTrendChart2";
 
 const MarketPlace = () => {
   const [orders, setOrders] = useState([]);
@@ -14,7 +14,9 @@ const MarketPlace = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get("http://localhost:3999/listorder");
-        setOrders(response.data.orders);
+        // Filter only pending orders
+        const pendingOrders = response.data.orders.filter(order => order.status === "pending");
+        setOrders(pendingOrders);
       } catch (err) {
         setError("Failed to fetch orders.");
       } finally {
@@ -41,7 +43,7 @@ const MarketPlace = () => {
     const buyer_wallet_address = localStorage.getItem("wallet_address"); // Get from localStorage
 
     try {
-        console.log(buyer_wallet_address)
+      console.log(buyer_wallet_address);
 
       const response = await axios.post("http://localhost:3999/placebid", {
         buyer_wallet_address,
@@ -69,7 +71,7 @@ const MarketPlace = () => {
 
       {/* Price Trend Chart */}
       <div className="mb-10">
-        <PriceTrendChart 
+        <PriceTrendChart2
           data={[
             { date: "Mon", price: 25 },
             { date: "Tue", price: 28 },
@@ -83,7 +85,7 @@ const MarketPlace = () => {
       </div>
 
       {orders.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No orders available at the moment.</p>
+        <p className="text-center text-gray-500 text-lg">No pending orders available at the moment.</p>
       ) : (
         <div className="flex flex-col gap-6">
           {orders.map((order) => (

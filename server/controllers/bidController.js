@@ -2,33 +2,41 @@
 const {Bid, User, Order} = require("../models")
 
 
+
 exports.placeBid = async (req, res) => {
-    try {
-        const { order_id, buyer_id, bid_price, cct_amount } = req.body;
+  try {
+    const { buyer_wallet_address, order_id, bid_price, cct_amount } = req.body;
 
-        const order = await Order.findByPk(order_id);
+    console.log(req.body)
 
-        if (!order) {
-            return res.status(404).json({ message: "Order not found" });
-        }
-
-        if (new Date() > new Date(order.expires_at)) {
-            return res.status(400).json({ message: "Order has already expired" });
-        }
-
-        const newBid = await Bid.create({
-            order_id,
-            buyer_id,
-            bid_price,
-            cct_amount
-        });
-
-        res.json({ message: "Bid placed successfully", bid: newBid });
-    } catch (error) {
-        console.error("❌ Error placing bid:", error);
-        res.status(500).json({ message: "Internal Server Error" });
+    if (!buyer_wallet_address || !order_id || !bid_price || !cct_amount) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
+
+    const buyer = await User.findOne({ where: { wallet_address: buyer_wallet_address } });
+
+    if (!buyer) {
+      return res.status(404).json({ message: "Buyer not found" });
+    }
+
+    // ✅ Insert bid with correct `buyer_id`
+    const newBid = await Bid.create({
+      order_id,
+      buyer_id: buyer.id, // 👈 Use integer ID instead of wallet address
+      bid_price,
+      cct_amount,
+      status: "PENDING",
+    });
+
+    res.json({ message: "✅ Bid placed successfully!", bid: newBid });
+
+  } catch (error) {
+    console.log(error)
+    console.error("❌ Error placing bid:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
+
 
 
 exports.viewBids = async (req, res) => {

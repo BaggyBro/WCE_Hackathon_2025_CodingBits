@@ -11,7 +11,9 @@ const menuItems = [
   { name: "Project Management", icon: <FiClipboard />, path: "/projectmanagementdashboard" },
   { name: "Transaction", icon: <FiSettings/>, path: "/transaction"},
   { name: "My Orders", icon: <FiBook/>, path: "/orders"},
-  { name: "Bids", icon: <FiFlag/>, path: "/bids"}
+  { name: "Bids", icon: <FiFlag/>, path: "/bids"},
+  { name: "Project Management", icon: <FiClipboard />, path: "/projectmanagementdashboard" }
+
 ];
 
 const SideNavbar = ({ activePage }) => {

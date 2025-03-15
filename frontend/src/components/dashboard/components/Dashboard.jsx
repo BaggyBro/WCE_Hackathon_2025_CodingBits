@@ -10,23 +10,14 @@ import SideNavbar from '../../NavBar';
 // Mock data - In a real app, this would come from an API
 const mockPriceData = [
   { date: 'Mon', price: 25 },
-  { date: 'Tue', price: 28 },
-  { date: 'Wed', price: 26 },
+  { date: 'Tue', price: 50 },
+  { date: 'Wed', price: 16 },
   { date: 'Thu', price: 32 },
-  { date: 'Fri', price: 30 },
-  { date: 'Sat', price: 35 },
+  { date: 'Fri', price: 35 },
+  { date: 'Sat', price: 46 },
   { date: 'Sun', price: 38 }
 ];
 
-const mockDemandSupplyData = [
-  { date: 'Mon', demand: 150, supply: 120 },
-  { date: 'Tue', demand: 180, supply: 130 },
-  { date: 'Wed', demand: 170, supply: 140 },
-  { date: 'Thu', demand: 200, supply: 150 },
-  { date: 'Fri', demand: 190, supply: 160 },
-  { date: 'Sat', demand: 220, supply: 170 },
-  { date: 'Sun', demand: 240, supply: 180 }
-];
 
 const DashBoard = () => {
   const [ethBalance, setEthBalance] = useState(0);
@@ -48,6 +39,23 @@ const DashBoard = () => {
 
     fetchBalance();
   }, [walletAddress]);
+
+  useEffect(() => {
+    const loadChatbot = () => {
+      const script1 = document.createElement('script');
+      script1.src = 'https://cdn.botpress.cloud/webchat/v2.3/inject.js';
+      script1.async = true;
+      script1.onload = () => {
+        const script2 = document.createElement('script');
+        script2.src = 'https://files.bpcontent.cloud/2025/03/13/06/20250313060649-M0QYQ1W5.js';
+        script2.async = true;
+        document.body.appendChild(script2);
+      };
+      document.body.appendChild(script1);
+    };
+
+    loadChatbot(); 
+  }, []); 
 
   return (
     <div className="flex min-h-screen bg-gray-50">
